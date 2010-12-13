@@ -99,15 +99,15 @@ function list_hooks_in_dir
 {
     if [ "$(testvercomp $FIND_VERSION 4.3.8 '>')" ] ;then
         if [ "$(testvercomp $SORT_VERSION 7.0 '>')" ] ; then
-                find "${1}/" -executable -type f 2>/dev/null | grep -v "^.$" | sort -V
+                find -L "${1}/" -executable -type f 2>/dev/null | grep -v "^.$" | sort -V
             else
-                find "${1}/" -executable -type f 2>/dev/null | grep -v "^.$" | sort
+                find -L "${1}/" -executable -type f 2>/dev/null | grep -v "^.$" | sort
             fi
     else
         if [ "$(testvercomp $SORT_VERSION 7.0 '<')" ] ; then
-            find "${1}/" -perm /u=x,g=x,o=x -type f 2>/dev/null | grep -v "^.$" | sort -V
+            find -L "${1}/" -perm /u=x,g=x,o=x -type f 2>/dev/null | grep -v "^.$" | sort -V
         else
-            find "${1}/" -perm /u=x,g=x,o=x -type f 2>/dev/null | grep -v "^.$" | sort
+            find -L "${1}/" -perm /u=x,g=x,o=x -type f 2>/dev/null | grep -v "^.$" | sort
         fi
     fi
 }
