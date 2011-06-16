@@ -90,7 +90,7 @@ function run_hook
 		do
 			hook="$tmpdir/`basename $name`".hook
 			git show "$sha1" >"$hook"
-			sh -x "$hook" "$@"
+			sh "$hook" "$@"
 		done
         fi
     done
