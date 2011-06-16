@@ -26,6 +26,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+tmpdir="/tmp/git-hooks.$$"
+trap "rm -rf $tmpdir; exit 0" 0 2 3 15
+mkdir $tmpdir
+
 function hook_dirs
 {
     if [ ! -z "${1}" ] ; then
@@ -69,16 +73,26 @@ function run_hook
 {
     set -e
     hook=`basename "${1}"`
-    if [ -z ${hook} ] ; then
+    if [ -z "${hook}" ] ; then
         echo "run requires a hook argument"
         return 1
     fi
     shift 1
     for dir in `hook_dirs "${hook}"`; do
-        if [ ! -d "${dir}" ] ; then
-            continue
+        if [ -d "${dir}" ]
+	then
+		run_hooks "${dir}" "$@"
+	elif [ `git config core.bare` = 'true' ]
+	then
+		# Extract the hooks from the HEAD revision into a tmp dir and run them:
+		git ls-tree -r HEAD git_hooks/"${dir}" |
+		while read mode type sha1 name
+		do
+			hook="$tmpdir/`basename $name`".hook
+			git show "$sha1" >"$hook"
+			sh -x "$hook" "$@"
+		done
         fi
-        run_hooks "${dir}" "$@"
     done
     set +e
 }
