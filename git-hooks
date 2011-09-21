@@ -26,29 +26,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-function hook_dirs
-{
-    if [ ! -z "${1}" ] ; then
-        hook="/${1}"
-    else
-        hook=""
-    fi
-    echo "${HOME}/.git_hooks${hook}"
-    GITDIR=`git rev-parse --git-dir`
-    cd $GITDIR/..
-    echo "${PWD}/git_hooks${hook}"
-    echo "${PWD}/.githooks${hook}"
-    eval echo "`git config hooks.global`"${hook}
-}
 
-function list_hooks_in_dir
-{
-	  if [[ $OSTYPE =~ 'darwin' ]] ; then	
-        find "${1}/" -type f 2>/dev/null | grep -v "^.$" | sort
-    else
-        find "${1}/" -executable -type f 2>/dev/null | grep -v "^.$" | sort -V
-    fi
-}
+
+
 
 function run_hooks
 {
@@ -116,6 +96,39 @@ git-hooks run "$0" "$@"' > "${file}"
     fi
 }
 
+##
+#   List function
+##
+
+# Return the directories in which search hooks
+# $1 ??
+function hook_dirs
+{
+    if [ ! -z "${1}" ] ; then
+        hook="/${1}"
+    else
+        hook=""
+    fi
+    echo "${HOME}/.git_hooks${hook}"
+    GITDIR=`git rev-parse --git-dir`
+    cd $GITDIR/..
+    echo "${PWD}/git_hooks${hook}"
+    echo "${PWD}/.githooks${hook}"
+    eval echo "`git config hooks.global`"${hook}
+}
+
+# List all hooks in the specified folder
+# $1 - the folder supposed to contain hooks
+function list_hooks_in_dir
+{
+    if [[ $OSTYPE =~ 'darwin' ]] ; then   
+        find "${1}/" -type f 2>/dev/null | grep -v "^.$" | sort
+    else
+        find "${1}" -executable -type f 2>/dev/null | grep -v "^.$" | sort -V
+    fi
+}
+
+# List all available hooks
 function list_hooks
 {
     GITDIR=`git rev-parse --git-dir`
