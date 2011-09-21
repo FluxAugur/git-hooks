@@ -27,7 +27,21 @@
 #
 
 
-
+function usage {
+    echo 'Git Hooks'
+    echo 'git hook [option] [cmd]'
+    echo ''
+    echo 'Options:'
+    echo '    --install             Replace existing hooks in this repository with a call to'
+    echo '                          git hooks run [hook].  Move old hooks directory to hooks.old'
+    echo '    --uninstall           Remove existing hooks in this repository and rename hooks.old'
+    echo '                          back to hooks'
+    echo '    --enable, -e [HOOK]   Enable the specified hook'
+    echo '    --disable, -d [HOOK]  Disable the specified hook'
+    echo 'Commands:'
+    echo '    run [cmd]      Run the hooks for cmd (such as pre-commit)'
+    echo '    list           Show currently installed hooks'
+}
 
 
 function run_hooks
@@ -50,6 +64,15 @@ function run_hooks
     done
 }
 
+
+##
+#   Run hooks
+##
+function report_error {
+    echo "Hook failed: $last_run_hook"
+    exit 1
+}
+
 function run_hook
 {
     set -e
@@ -68,6 +91,9 @@ function run_hook
     set +e
 }
 
+##
+#   Install / Uninstall hooks in the git repository
+##
 function install_hooks
 {
     GITDIR=`git rev-parse --git-dir`
@@ -124,7 +150,8 @@ function list_hooks_in_dir
     if [[ $OSTYPE =~ 'darwin' ]] ; then   
         find "${1}/" -type f 2>/dev/null | grep -v "^.$" | sort
     else
-        find "${1}" -executable -type f 2>/dev/null | grep -v "^.$" | sort -V
+        # find "${1}" -executable -type f 2>/dev/null | grep -v "^.$" | sort -V
+        find "${1}" -type f 2>/dev/null | grep -v "^.$" | sort -V
     fi
 }
 
@@ -146,19 +173,69 @@ function list_hooks
     for dir in `hook_dirs`; do
         echo "${dir}:"
         for hook in `list_hooks_in_dir "${dir}"` ; do
+            # Display if hook is enable or not ( is executable or not )
+            if [[ -x ${hook} ]]; then
+                echo -en "\x1b[32m E \x1b[0m\t"
+            else
+                echo -en "\x1b[31m  D \x1b[0m\t"
+            fi
             echo -n `basename \`dirname "${hook}"\``
-            echo -e "/`basename "${hook}"` \t- `${hook} --about`"
+            echo -ne "/`basename "${hook}"`"
+            
+            if [[ -x ${hook} ]]; then
+                echo -e "\t- `${hook} --about 2>/dev/null`"
+            else
+                echo -e ""
+            fi
         done
         echo ""
     done
 }
 
-function report_error {
-    echo "Hook failed: $last_run_hook"
-    exit 1
+##
+#   Enable / Disable hooks
+##
+
+# Enable the specified hook
+# $1 - the file name of the hook to be enabled
+function enable_hook {
+    for dir in `hook_dirs`; do
+        for hook in `list_hooks_in_dir "${dir}"` ; do
+            if [[ $1 = '*' ]]; then
+                echo "Enabling ${hook}"
+                chmod +x ${hook}
+            else
+                if [[ $1 = `basename "${hook}"` ]]; then
+                    echo "Enabling ${hook}"
+                    chmod +x ${hook}
+                fi
+            fi
+        done
+    done
+}
+
+# Disable the specified hook
+# $1 - the file name of the hook to be disabled
+function disable_hook {
+    for dir in `hook_dirs`; do
+        for hook in `list_hooks_in_dir "${dir}"` ; do
+            if [[ $1 = '*' ]]; then
+                echo "Disabling ${hook}"
+                chmod -x ${hook}
+            else
+                if [[ $1 = `basename "${hook}"` ]]; then
+                    echo "Disabling ${hook}"
+                    chmod -x ${hook}
+                fi
+            fi
+        done
+    done    
 }
 
 case $1 in
+    list )
+        list_hooks
+        ;;
     run )
         if [ ! -z "${GIT_DIR}" ] ; then
             unset GIT_DIR
@@ -170,18 +247,16 @@ case $1 in
     --install|--uninstall )
         install_hooks "$1"
         ;;
+    -e|--enable )
+        enable_hook $2
+        ;;
+    -d|--disable )
+        disable_hook $2
+        ;;
     -h|--help )
-        echo 'Git Hooks'
-        echo ''
-        echo 'Options:'
-        echo '    --install      Replace existing hooks in this repository with a call to'
-        echo '                   git hooks run [hook].  Move old hooks directory to hooks.old'
-        echo '    --uninstall    Remove existing hooks in this repository and rename hooks.old'
-        echo '                   back to hooks'
-        echo "    run [cmd]      Run the hooks for cmd (such as pre-commit)"
-        echo "    (no arguments) Show currently installed hooks"
+        usage
         ;;
     * )
-        list_hooks
+        usage
         ;;
 esac
