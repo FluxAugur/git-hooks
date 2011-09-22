@@ -11,7 +11,7 @@ Add git-hooks to your PATH environment variable so 'git hooks' can be run. In `~
 
     # Load Git-hook
     export PATH=$PATH:/opt/git-hooks
-    
+
 This assume you have installed git-hooks in /opt folder.
 
 Run 'git hooks --install' Inside a git project to change that projects git hooks to use git-hooks hooks.  'git hooks --uninstall' can be run at any time to go back to the old hooks that were installed before (typically the default which does nothing).
@@ -85,6 +85,18 @@ Now this 2 hooks are enabled ( notice the 'E' at the beginning of the line ). No
     $ git hooks -d db-import
 
 This will make git hooks search in the hooks folders a hook with name 'db-import' and disable it ( this means simply a chmod -x on the file ).
+Now this is wath you get:  
+    
+    $ git hooks list
+    Git hooks ARE installed in this repository.
+
+    Listing User, Project, and Global hooks:
+    ---
+    /home/$USER/.git_hooks:
+
+    /home/$USER/code/git/project/.githooks:
+      D post-checkout/db-import - Import the database linked to the specified branch
+     E  post-commit/db-dump - Dump the database after each commit
 
 You can also disable ALL HOOKS with a single command:  
     
