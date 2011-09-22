@@ -36,10 +36,10 @@ function usage {
     echo '                          git hooks run [hook].  Move old hooks directory to hooks.old'
     echo '    --uninstall           Remove existing hooks in this repository and rename hooks.old'
     echo '                          back to hooks'
-    echo '    --enable, -e [HOOK]   Enable the specified hook'
-    echo '                          You can use "*"" as a wildcard to enable all hooks'
-    echo '    --disable, -d [HOOK]  Disable the specified hook'
-    echo '                          You can use "*"" as a wildcard to disable all hooks'
+    echo '    --enable, -e [HOOK]   Enable the specified hook, if no hook name is specified, all'
+    echo '                          hooks will be enabled'
+    echo '    --disable, -d [HOOK]  Disable the specified hook, if no hook name is specified, all'
+    echo '                          hooks will be disabled'
     echo 'Commands:'
     echo '    run [cmd]      Run the hooks for cmd (such as pre-commit)'
     echo '    list           Show currently installed hooks'
@@ -204,7 +204,7 @@ function list_hooks
 function enable_hook {
     for dir in `hook_dirs`; do
         for hook in `list_hooks_in_dir "${dir}"` ; do
-            if [[ $1 = '*' ]]; then
+            if [[ $# -eq 0 ]]; then
                 echo "Enabling ${hook}"
                 chmod +x ${hook}
             else
@@ -222,7 +222,7 @@ function enable_hook {
 function disable_hook {
     for dir in `hook_dirs`; do
         for hook in `list_hooks_in_dir "${dir}"` ; do
-            if [[ $1 = '*' ]]; then
+            if [[ $# -eq 0 ]]; then
                 echo "Disabling ${hook}"
                 chmod -x ${hook}
             else
