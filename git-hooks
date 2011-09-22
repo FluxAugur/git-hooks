@@ -116,6 +116,9 @@ function install_hooks
 git-hooks run "$0" "$@"' > "${file}"
             chmod +x "${file}"
         done
+	if [[ ! -e "../../.githooks" ]]; then
+		mkdir "../../.githooks"
+	fi
     else
         if [ ! -d hooks.old ] ; then
             echo "Error, hooks.old doesn't exists, aborting uninstall to not destroy something"
