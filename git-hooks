@@ -60,7 +60,9 @@ function run_hooks
             echo -n `basename \`dirname "${hook}"\``
             echo "/`basename "${hook}"`"
         fi
-        ${hook} "$@"
+        if [[ -x ${hook} ]]; then
+            ${hook} "$@"
+        fi
     done
 }
 
@@ -175,9 +177,9 @@ function list_hooks
         for hook in `list_hooks_in_dir "${dir}"` ; do
             # Display if hook is enable or not ( is executable or not )
             if [[ -x ${hook} ]]; then
-                echo -en "\x1b[32m E \x1b[0m\t"
+                echo -en "\x1b[32m E \x1b[0m\t" # output green E
             else
-                echo -en "\x1b[31m  D \x1b[0m\t"
+                echo -en "\x1b[31m  D \x1b[0m\t" # output red D
             fi
             echo -n `basename \`dirname "${hook}"\``
             echo -ne "/`basename "${hook}"`"
