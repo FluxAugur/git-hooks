@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# db-dump - Git Post Commit Hook
+# This scripts create a dump of the selected database on each commit, adding the file to the
+# commit itself. The file is named with the branch name, and overridden every dump. His history can
+# be found in git history!
+#
+# Author   : Edoardo Tenani < edoardo.tenani@gmail.com >
+# Copyright: (c) 2011 - Edoardo Tenani
+# License  : Public Domain
+#
+# Config
+# hooks.db-hooks.path   : the path in which db dump will be saved ( use a absolute path! )
+# hooks.db-hooks.uname  : the username to connect to the database
+# hooks.db-hooks.passwd : the password to connect to the database
+# hooks.db-hooks.dbname : the name of the database to be dumped
+#
+# To set a config you can use `git config hooks.db-hook.{param}`. This configs are specified
+# per-project
+
+function run() {
+  # The absolute path to the directory in which save the db dump ( no trailing slash! )
+  # SAVE_FOLDER="$HOME/code/git/radioohm/sites/default/db-dump"
+  #SAVE_FOLDER="$HOME/code/git/git-hooks/asd/db-dump"
+  
+  if [[ -z $(git config hooks.db-hook.path) || \
+        -z $(git config hooks.db-hook.uname) || \
+        -z $(git config hooks.db-hook.passwd) || \
+        -z $(git config hooks.db-hook.dbname) ]]; then
+    echo "[post-commit::db-dump] Invalid parameters, aborting!" 
+    return
+  fi
+
+  SAVE_FOLDER=$(git config hooks.db-hook.path)
+
+  branch=$(git br | grep "*" | cut -c3-)
+
+# http://stackoverflow.com/questions/229551/string-contains-in-bash/229606#229606
+  if [[ ${branch} == */* ]]; then
+    root_branch=$(echo ${branch} | cut -d/ -f1)
+    file=$(echo ${branch} | cut -d/ -f2)
+
+    save_file=${SAVE_FOLDER}/${root_branch}/${file}.sql
+  else
+    save_file=${SAVE_FOLDER}/${branch}.sql
+  fi
+
+  # Check if main branch folder exists
+  if [[ ! -d $(dirname ${save_file}) ]]; then
+    mkdir -p $(dirname ${save_file})
+  fi
+
+  # Dump the database
+  uname=$(git config hooks.db-hook.uname)
+  passwd=$(git config hooks.db-hook.passwd)
+  dbname=$(git config hooks.db-hook.dbname)
+  mysqldump -u ${uname} -p${passwd} ${dbname} > ${save_file}
+
+  # Check for error and commit file ( amending previous commit)
+  if [[ $? -eq 0 ]]; then
+    echo "[post-commit::db-dump] Successfull dumped > ${save_file}"
+    git add ${save_file}
+    git hooks -d db-dump > /dev/null 2>&1
+
+    reflog=$(git log -n 1 --pretty=format:"%s\n%b")
+    git ci --amend -m "${reflog}\n\n[post-commit::db-bump] Automatic commit" > /dev/null 2>&1
+
+    git hooks -e db-dump > /dev/null 2>&1
+  else
+    echo "[post-commit::db-dump] Error occurred"
+  fi
+}
+
+case "${1}" in
+    --about )
+      echo "Dump the Database after each commit, saving in a dump related to the current branch"
+      ;;
+    * )
+      run $@
+      ;;
+esac
