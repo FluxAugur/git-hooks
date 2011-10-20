@@ -63,7 +63,7 @@ function run() {
     git hooks -d db-dump > /dev/null 2>&1
 
     reflog=$(git log -n 1 --pretty=format:"%s\n%b")
-    git ci --amend -m "${reflog}\n\n[post-commit::db-bump] Automatic commit" > /dev/null 2>&1
+    git ci --amend -m "${reflog}" > /dev/null 2>&1
 
     git hooks -e db-dump > /dev/null 2>&1
   else
