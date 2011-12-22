@@ -82,9 +82,9 @@ Example:
 
 Now this 2 hooks are enabled ( notice the 'E' at the beginning of the line ). Now I can disable one of them using:  
     
-    $ git hooks -d db-import
+    $ git hooks -d post-checkout/db-import
 
-This will make git hooks search in the hooks folders a hook with name 'db-import' and disable it ( this means simply a chmod -x on the file ).
+This will make git hooks search in the hooks 'post-checkout' subfolders for a hook with name 'db-import' and disable it ( this means simply a chmod -x on the file ).
 Now this is wath you get:  
     
     $ git hooks list
