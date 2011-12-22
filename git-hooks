@@ -211,7 +211,7 @@ function enable_hook {
                 echo "Enabling ${hook}"
                 chmod +x ${hook}
             else
-                if [[ $1 = `basename "${hook}"` ]]; then
+                if [[ $1 = `echo "${hook}" | rev | cut -d"/" -f1,2 | rev` ]]; then
                     echo "Enabling ${hook}"
                     chmod +x ${hook}
                 fi
@@ -229,7 +229,7 @@ function disable_hook {
                 echo "Disabling ${hook}"
                 chmod -x ${hook}
             else
-                if [[ $1 = `basename "${hook}"` ]]; then
+                if [[ $1 = `echo "${hook}" | rev | cut -d"/" -f1,2 | rev` ]]; then
                     echo "Disabling ${hook}"
                     chmod -x ${hook}
                 fi
