@@ -13,10 +13,8 @@ run_test() {
     # http://newartisans.com/2009/02/building-a-better-pre-commit-hook-for-git
     # http://stackoverflow.com/questions/2412450/git-pre-commit-hook-changed-added-files
 
-    git diff --cached --name-only --diff-filter=ACM | grep '\.py$' | xargs --no-run-if-empty pylint -E
-
-    # avoid failures as soon as pylint has some false positives: http://www.logilab.org/blogentry/78354
-    true
+    # `|| true` to avoid failures as soon as pylint has some false positives: http://www.logilab.org/blogentry/78354
+    git diff --cached --name-only --diff-filter=ACM | grep '\.py$' | xargs --no-run-if-empty pylint -E || true
 }
 
 case "${1}" in
