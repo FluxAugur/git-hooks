@@ -38,6 +38,8 @@ function hook_dirs
     cd $GITDIR/..
     echo "${PWD}/git_hooks${hook}"
     echo "${PWD}/.githooks${hook}"
+    echo "${GITDIR}/git_hooks${hook}"
+    echo "${GITDIR}/.githooks${hook}"
     eval echo "`git config hooks.global`"${hook}
 }
 
