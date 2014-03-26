@@ -37,7 +37,7 @@ function hook_dirs
     git rev-parse --git-dir &> /dev/null
     if [ $? -eq 0 ]; then
     if [ $(git rev-parse --is-bare-repository) = 'false' ]; then
-        cd $(git rev-parse --show-toplevel)
+        cd "$(git rev-parse --show-toplevel)"
         echo "${PWD}/git_hooks${hook}"
         echo "${PWD}/.githooks${hook}"
     fi
@@ -86,12 +86,15 @@ function run_hook
         return 1
     fi
     shift 1
+    SAVE_IFS=$IFS
+    IFS=$(echo -en "\n\b")
     for dir in `hook_dirs "${hook}"`; do
         if [ ! -d "${dir}" ] ; then
             continue
         fi
         run_hooks "${dir}" "$@"
     done
+    IFS=$SAVE_IFS
     set +e
 }
 
@@ -152,6 +155,10 @@ function list_hooks
 
     echo 'Listing User, Project, and Global hooks:'
     echo '---'
+
+    SAVE_IFS=$IFS
+    IFS=$(echo -en "\n\b")
+
     for dir in `hook_dirs`; do
         echo "${dir}:"
         for hook in `list_hooks_in_dir "${dir}" 2` ; do
@@ -160,6 +167,7 @@ function list_hooks
         done
         echo ""
     done
+    IFS=$SAVE_IFS
 }
 
 function report_error {
