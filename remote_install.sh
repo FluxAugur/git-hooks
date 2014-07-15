@@ -15,3 +15,7 @@ chmod +x 25characterlimit.sh
 
 echo "export PATH=$PATH:~/.git_hooks" >> ~/.bash_profile
 export PATH=$PATH:~/.git_hooks
+
+#usage instructions
+echo "git-hooks was successfully installed"
+echo "use 'git-hooks --install' in a git repo to activate it"
