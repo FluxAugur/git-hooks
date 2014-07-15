@@ -9,7 +9,15 @@ Install
 
 To install from a local copy execute the `local_install.sh` script.
 
-To install directly from the github repo, execute the `remote_install.sh` script.
+To install directly from the github repo, execute the following commands:
+
+```
+wget https://raw.githubusercontent.com/SDW-CC/git-hooks/master/remote_install.sh
+chmod +x remote_install.sh
+./remote_install.sh
+
+```
+This will donload and execute the remote installation script.
 
 Execute the `uninstall.sh` script to remove git-hooks form your machine if you installed with the above scripts.
 
