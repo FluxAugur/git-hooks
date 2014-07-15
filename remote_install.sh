@@ -13,5 +13,5 @@ cd commit-msg
 wget https://raw.githubusercontent.com/SDW-CC/git-hooks/master/git_hooks/commit-msg/25characterlimit.sh
 chmod +x 25characterlimit.sh
 
-echo "export PATH=PATH:~/.git_hooks" >> ~/.bash_profile
+echo "export PATH=$PATH:~/.git_hooks" >> ~/.bash_profile
 export PATH=$PATH:~/.git_hooks
