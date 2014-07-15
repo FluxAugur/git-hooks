@@ -7,7 +7,11 @@ When a hook is called by `git`, git-hooks will check each of these locations for
 Install
 =======
 
-Add git-hooks to your `PATH` environment variable so `git hooks` can be run.
+To install from a local copy execute the `local_install.sh` script.
+
+To install directly from the github repo, execute the `remote_install.sh` script.
+
+Execute the `uninstall.sh` script to remove git-hooks form your machine if you installed with the above scripts.
 
 Run `git hooks --install` in a git project tell it to use git-hooks hooks.  You can run `git hooks --uninstall` at any time to revert to your previous hooks.  (These are usually the default hooks, which do nothing.)
 
@@ -60,11 +64,30 @@ You can even specify _multiple_ directories for your global hooks! Simply separa
 Creating hooks
 ==============
 
-To keep things organized, git-hooks looks for scripts in **sub-directories** named after the git hook name.  For example, this project has the following `pre-commit` script in the following location:
+To keep things organized, git-hooks looks for scripts in **sub-directories** named after the git hook name.  For example, the commit-msg hook scripts may be located in the following folder:
 
-	   git_hooks/pre-commit/bsd
+	   ~/.git_hooks/commit-msg
 
 When `git hooks` is run without arguments, it lists all hooks installed on your system.  It will run the hooks with the `--about` argument to generate the description shown.  
 
-Check out the hooks in `contrib/` for some examples.
+When creating hooks please use the following template:
 
+```
+#!/bin/bash
+
+function <insert function name here>
+{
+    <insert function body here>
+}
+
+
+case "${1}" in
+    --about )
+        echo -n "<add a description for your hook script>"
+        ;;
+    * )
+        <call your function here> "$@"
+        ;;
+esac
+
+```

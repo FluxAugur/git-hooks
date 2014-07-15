@@ -4,16 +4,14 @@
 cd ~
 mkdir .git_hooks
 cd .git_hooks
-wget #download the script
+wget https://raw.githubusercontent.com/SDW-CC/git-hooks/master/git-hooks
 chmod +x git-hooks
 
 #creates the commit-msg folder and downloads the commit-msg hook script
 mkdir commit-msg
 cd commit-msg
-wget #download the hook
+wget https://raw.githubusercontent.com/SDW-CC/git-hooks/master/git_hooks/commit-msg/25characterlimit.sh
 chmod +x 25characterlimit.sh
-
 
 echo "export PATH=PATH:~/.git_hooks" >> ~/.bash_profile
 export PATH=$PATH:~/.git_hooks
-
