@@ -2,7 +2,7 @@
 
 echo "Before removing git-hooks from your system make syre to run: 'git-hooks --uninstall' on all your repos"
 echo "This can also be done manually. The backup hooks folder is called hooks.old and can be found in the .git folder in your repos"
-read -p "Do you really wish to remove git-hooks: " -n 1 -r
+read -p "Do you really wish to remove git-hooks: " -r
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
     rm -rf ~/.git_hooks
