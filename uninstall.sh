@@ -5,7 +5,7 @@ echo "This can also be done manually. The backup hooks folder is called hooks.ol
 read -p "Do you really wish to remove git-hooks: " -n 1 -r
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    rm -rf $PWD
+    rm -rf ~/.git_hooks
     echo "Git-hooks was removed from your system"
     echo "Please proceed to remove the ~/.git_hooks folder from the PATH by editing the ~/.bahs_profile file"
 else
