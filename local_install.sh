@@ -20,7 +20,7 @@ mkdir ~/.git_hooks/commit-msg
 
 #copies the commit-msg hook script and make it executable
 cp git_hooks/commit-msg/25characterlimit.sh ~/.git_hooks/commit-msg
-chmod +x ~/.git_hooks/commit-msg 25characterlimit.sh
+chmod +x ~/.git_hooks/commit-msg/25characterlimit.sh
 
 #adds the .git-hooks file to the path and makes sure it is loaded
 echo "export PATH=PATH:~/.git_hooks" >> ~/.bash_profile
