@@ -15,6 +15,7 @@ To install directly from the github repo, execute the following commands:
 wget https://raw.githubusercontent.com/SDW-CC/git-hooks/master/remote_install.sh
 chmod +x remote_install.sh
 ./remote_install.sh
+source ~/.bash_profile
 
 ```
 This will donload and execute the remote installation script.
