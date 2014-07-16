@@ -150,7 +150,8 @@ function install_hooks
             return 1
         fi
         if [ "$(uname)" == "Darwin" ]; then
-            #to be implemented when needed
+            cmd='#!/usr/bin/env bash
+git-hooks run "$0" "$@"';
         elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
             cmd='#!/usr/bin/env bash
 git-hooks run "$0" "$@"';
