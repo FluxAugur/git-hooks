@@ -3,7 +3,7 @@ About git-hooks
 
 A tool to manage project, user, and global Git hooks for multiple git repositories.
 
-git-hooks lets hooks be installed inside git repositories, users home directory, and globally.  
+It allows hooks to be installed inside git repositories, users home directory, and globally.  
 When a hook is called by `git`, git-hooks will check each of these locations for the hooks to run.
 
 
@@ -36,13 +36,13 @@ win_remote_install.bat
 
 ```
 
-After instalation add the %USERPROFILE%\\.git_hooks folder to the PATH.
+After instalation add the `%USERPROFILE%\.git_hooks` folder to the PATH.
 
 
 Uninstall 
 =======
 
-**Linux:** execute the `uninstall.sh` script and remove the instalation folder from the PATH inside the ~/.bash_profile file.
+**Linux:** execute the `uninstall.sh` script and remove the instalation folder from the PATH inside the `~/.bash_profile` file.
 
 **Windows:** execute the `win_uninstall.bat` script and remove the instalation folder from the PATH.
 
