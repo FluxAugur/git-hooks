@@ -24,6 +24,7 @@ chmod +x ~/.git_hooks/commit-msg/25characterlimit.sh
 
 #adds the .git-hooks file to the path and makes sure it is loaded
 echo "export PATH=\$PATH:~/.git_hooks" >> ~/.bash_profile
+export PATH=$PATH:~/.git_hooks
 
 #usage instructions
 echo "git-hooks was successfully installed"

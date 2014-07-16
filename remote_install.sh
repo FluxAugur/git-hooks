@@ -14,6 +14,7 @@ wget https://raw.githubusercontent.com/SDW-CC/git-hooks/master/git_hooks/commit-
 chmod +x 25characterlimit.sh
 
 echo "export PATH=\$PATH:~/.git_hooks" >> ~/.bash_profile
+export PATH=$PATH:~/.git_hooks
 
 #usage instructions
 echo "git-hooks was successfully installed"

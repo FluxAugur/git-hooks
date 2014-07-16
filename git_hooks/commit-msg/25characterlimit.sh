@@ -37,7 +37,7 @@ function check_commit_length
       echo "${cc_white}Commit message:"
       echo "$message"
       echo ""
-      echo "Have a nice day!"
+      echo "Have a nice day!${cc_normal}"
       exit 1
     fi
 }
