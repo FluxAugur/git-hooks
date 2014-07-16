@@ -15,7 +15,7 @@ powershell -command "& { (New-Object Net.WebClient).DownloadFile('https://raw.gi
 
 REM usage instructions
 echo git-hooks was successfully installed
-echo please add the '%USERPROFILE%\.git-hooks' folder to your PATH and restart your system in order to use it
+echo please add the '%USERPROFILE%\.git-hooks' folder to your PATH and restart your terminal in order to use it
 
 cd %USERPROFILE%
 pause

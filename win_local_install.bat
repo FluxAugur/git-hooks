@@ -21,6 +21,6 @@ copy "git_hooks\commit-msg\25characterlimit.sh" "%USERPROFILE%\.git_hooks\commit
 
 REM usage instructions
 echo git-hooks was successfully installed
-echo please add the '%USERPROFILE%\.git-hooks' folder to your PATH and restart your system in order to use it
+echo please add the '%USERPROFILE%\.git-hooks' folder to your PATH and restart your terminal in order to use it
 
 pause
