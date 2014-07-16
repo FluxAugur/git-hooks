@@ -149,9 +149,16 @@ function install_hooks
             echo "hooks.old already exists, perhaps you already installed?"
             return 1
         fi
-    cmd='#!/usr/bin/env bash
+        if [ "$(uname)" == "Darwin" ]; then
+            #to be implemented when needed
+        elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+            cmd='#!/usr/bin/env bash
 git-hooks run "$0" "$@"';
-    install_hooks_into "${PWD}" "${cmd}"
+        else
+            cmd='#!/usr/bin/env bash
+git-hooks.sh run "$0" "$@"';
+        fi
+        install_hooks_into "${PWD}" "${cmd}"
     else
         if [ ! -d hooks.old ] ; then
             echo "Error, hooks.old doesn't exists, aborting uninstall to not destroy something"
