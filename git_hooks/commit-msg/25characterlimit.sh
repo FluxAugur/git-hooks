@@ -28,7 +28,7 @@ function check_commit_length
     esc=`echo -en "\033"`;
     cc_yellow="${esc}[1;33m";
     cc_red="${esc}[1;31m";
-    cc_normal=`echo -en "${esc}[m\017"`;
+    cc_normal=`echo -en "${esc}[1;37m"`;
     if [ "$size" -lt "$message_limit" ]
     then
       echo "${cc_red}Error error error ....${cc_normal}"
