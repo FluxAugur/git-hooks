@@ -4,7 +4,7 @@ git-hooks lets hooks be installed inside git repositories, users home directory,
 When a hook is called by `git`, git-hooks will check each of these locations for the hooks to run.
 
 
-Install
+Install (Linux)
 =======
 
 To install from a local copy execute the `local_install.sh` script.
@@ -18,9 +18,34 @@ chmod +x remote_install.sh
 source ~/.bash_profile
 
 ```
-This will donload and execute the remote installation script.
 
-Execute the `uninstall.sh` script to remove git-hooks form your machine if you installed with the above scripts.
+
+Install (Windows)
+=======
+
+To install from a local copy execute the `win_local_install.bat` script.
+
+To install directly from the github repo, execute the following commands:
+
+```
+powershell -command "& { (New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/SDW-CC/git-hooks/master/win_remote_install.bat', 'win_remote_install.bat') }"
+win_remote_install.bat
+
+```
+
+After instalation add the %USERPROFILE%\.git_hooks folder to the PATH.
+
+
+Uninstall 
+=======
+
+Linux: execute the `uninstall.sh` script and remove the instalation folder from the PATH inside the ~/.bash_profile file.
+
+Windows: execute the `win_uninstall.bat` script and remove the instalation folder from the PATH.
+
+
+Usage
+=======
 
 Run `git hooks --install` in a git project tell it to use git-hooks hooks.  You can run `git hooks --uninstall` at any time to revert to your previous hooks.  (These are usually the default hooks, which do nothing.)
 
@@ -32,6 +57,7 @@ Overview
 
 Hooks are powerful and useful.  Some common hooks include:
 
+- Verify that the commit message has a certain length.
 - Spell check the commit message.
 - Verify that the code builds.
 - Verify that any new files contain a copyright with the current year in it.
@@ -63,7 +89,7 @@ git-hooks provide a way to manage and share your hooks using three locations:
  - **Project hooks**, installed in `.git/git_hooks/` in a project.
  - **Global hooks**, specified with the `hooks.global` configuration option.
 
-The `contrib/` directory includes a number of useful hooks, and can be set by doing the following:
+To add a folder to the Global hooks configuration use the following command:
 
 	   git config --global hooks.global $PWD/contrib/
 
