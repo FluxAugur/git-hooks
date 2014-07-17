@@ -10,4 +10,4 @@ powershell -command "& { (New-Object Net.WebClient).DownloadFile('https://raw.gi
 REM creates the commit-msg folder and downloads the commit-msg hook script
 mkdir %USERPROFILE%\.githook\commit-msg
 
-powershell -command "& { (New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/SDW-CC/git-hooks/master/githook/commit-msg/25characterlimit.sh', '%USERPROFILE%\.githook\commit-msg\25characterlimit.sh') }"
+powershell -command "& { (New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/SDW-CC/git-hooks/master/hooks/commit-msg/25characterlimit.sh', '%USERPROFILE%\.githook\commit-msg\25characterlimit.sh') }"
