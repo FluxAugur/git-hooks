@@ -3,6 +3,8 @@
 #create the .git_hooks folder in the user's home, downloads the git-hooks script and makes it executable
 mkdir ~/.githook
 wget -P ~/.githook https://raw.githubusercontent.com/SDW-CC/git-hooks/master/githook
+wget -P ~/.githook https://raw.githubusercontent.com/SDW-CC/git-hooks/master/LICENSE
+wget -P ~/.githook https://github.com/SDW-CC/git-hooks/blob/master/README.md
 chmod +x ~/.githook/githook
 
 #creates the commit-msg folder and downloads the commit-msg hook script
