@@ -58,7 +58,7 @@ Run `githook remove-global` to force any new git repository or any git repositor
 
 **Windows:**
 
-Same as above, except you have to run everything with 'githook.sh' instead of 'githook'.
+Same as above, except you have to run everything with `githook.sh` instead of `githook`.
 
 
 Creating hooks
@@ -66,11 +66,9 @@ Creating hooks
 
 To keep things organized, git-hooks looks for scripts in **sub-directories** named after the git hook name.  For example, the commit-msg hook scripts may be located in the following folder:
 
-**Linux**
-	   ~/.githook/commit-msg
+**Linux**: `~/.githook/commit-msg`
 
-**Windows**
-       %USERPROFILE%\\.githook\\commit-msg
+**Windows** `%USERPROFILE%\.githook\commit-msg`
 
 When `githook` is run without arguments, it lists all hooks installed on your system.  It will run the hooks with the `--about` argument to generate the description shown.  
 
