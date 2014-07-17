@@ -13,4 +13,3 @@ wget -P ~/.githook/commit-msg https://raw.githubusercontent.com/SDW-CC/git-hooks
 chmod +x ~/.githook/commit-msg/25characterlimit.sh
 
 echo "export PATH=\$PATH:~/.githook" >> ~/.bash_profile
-export PATH=$PATH:~/.githook
