@@ -34,7 +34,6 @@ function hook_dirs
         hook=""
     fi
     echo "${HOME}/.githook${hook}"
-    eval echo "`git config hooks.global`"${hook}
 }
 
 function list_hooks_in_dir
@@ -229,7 +228,7 @@ case $1 in
         echo '    remove-global  Resets the hook template directory to dafault'
         echo '    run <cmd>      Run the hooks for <cmd> (such as pre-commit)'
         echo '    help           Displays a list of options'
-        echo '    (no arguments) Show currently installed hooks'
+        echo '    (no arguments) Show currently available hooks'
         ;;
     * )
         list_hooks
