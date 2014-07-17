@@ -1,31 +1,27 @@
 #!/bin/bash
 
 #creates the .git_hooks folder in the user's home
-mkdir ~/.git_hooks
+mkdir ~/.githook
 
-#copies the git-hooks script and make it executable
-cp git-hooks ~/.git_hooks
-chmod +x ~/.git_hooks/git-hooks
+#copies the githook script and make it executable
+cp githook ~/.githook
+chmod +x ~/.githook/githook
 
 #copies the uninstall script and make it executable
-cp uninstall.sh ~/.git_hooks
-chmod +x ~/.git_hooks/uninstall.sh
+cp uninstall.sh ~/.githook
+chmod +x ~/.githook/uninstall.sh
 
 #copies the readme and licence scripts
-cp README.md ~/.git_hooks
-cp LICENSE ~/.git_hooks
+cp README.md ~/.githook
+cp LICENSE ~/.githook
 
 #creates the commit-msg folder
-mkdir ~/.git_hooks/commit-msg
+mkdir ~/.githook/commit-msg
 
 #copies the commit-msg hook script and make it executable
-cp git_hooks/commit-msg/25characterlimit.sh ~/.git_hooks/commit-msg
-chmod +x ~/.git_hooks/commit-msg/25characterlimit.sh
+cp hooks/commit-msg/25characterlimit.sh ~/.githook/commit-msg
+chmod +x ~/.githook/commit-msg/25characterlimit.sh
 
 #adds the .git-hooks file to the path and makes sure it is loaded
-echo "export PATH=\$PATH:~/.git_hooks" >> ~/.bash_profile
-export PATH=$PATH:~/.git_hooks
-
-#usage instructions
-echo "git-hooks was successfully installed"
-echo "use 'git-hooks --install' in a git repo to activate it"
+echo "export PATH=\$PATH:~/.githook" >> ~/.bash_profile
+export PATH=$PATH:~/.githook

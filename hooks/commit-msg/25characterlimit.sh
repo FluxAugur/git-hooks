@@ -23,21 +23,17 @@ function check_commit_length
     message_file=$1
     message=$(<$message_file)
     size=${#message}
-    echo $status
 
     esc=`echo -en "\033"`;
     cc_yellow="${esc}[1;33m";
     cc_red="${esc}[1;31m";
     cc_white="${esc}[1;37m";
-    cc_normal=`echo -en "${esc}[m\017"`;
+    cc_normal="${esc}[00m";
     if [ "$size" -lt "$message_limit" ]
     then
       echo "${cc_red}Error error error ....${cc_white}"
-      echo "Your commit message has ${cc_red}$size ${cc_white}characters and needs at least ${cc_yellow}$message_limit"
-      echo "${cc_white}Commit message:"
-      echo "$message"
-      echo ""
-      echo "Have a nice day!${cc_normal}"
+      echo "Your commit message has ${cc_red}$size ${cc_white}characters and needs at least ${cc_yellow}${message_limit}${cc_white}."
+      echo "Commit message:${cc_normal} $message"
       exit 1
     fi
 }
