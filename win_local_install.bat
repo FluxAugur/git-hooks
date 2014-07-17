@@ -17,4 +17,4 @@ REM creates the commit-msg folder
 mkdir %USERPROFILE%\.githook\commit-msg
 
 REM copies the commit-msg hook script and make it executable
-copy "hooks\commit-msg\25characterlimit.sh" "%USERPROFILE%\.git_hooks\commit-msg" >NUL
+copy "hooks\commit-msg\25characterlimit.sh" "%USERPROFILE%\.githook\commit-msg" >NUL
