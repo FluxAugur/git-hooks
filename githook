@@ -214,7 +214,7 @@ case $1 in
         ;;
     help|-h|--help|-? )
         echo 'Git Hooks'
-        echo '    A tool to manage project, user, and global Git hooks for multiple git repositories.'
+        echo '    A tool to manage global git hooks for multiple git repositories.'
         echo '    https://github.com/SDW-CC/git-hooks'
         echo ''
         echo 'Options:'

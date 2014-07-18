@@ -12,7 +12,7 @@ To install from a local copy execute the `local_install.sh` script.
 To install directly from the github repo, execute the following commands:
 
 ```
-wget https://raw.githubusercontent.com/SDW-CC/git-hooks/master/remote_install.sh
+wget https://raw.githubusercontent.com/sdwolf/git-hooks/master/remote_install.sh
 chmod +x remote_install.sh
 ./remote_install.sh
 source ~/.bash_profile
@@ -28,7 +28,7 @@ To install from a local copy execute the `win_local_install.bat` script.
 To install directly from the github repo, execute the following commands:
 
 ```
-powershell -command "& { (New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/SDW-CC/git-hooks/master/win_remote_install.bat', 'win_remote_install.bat') }"
+powershell -command "& { (New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/sdwolf/git-hooks/master/win_remote_install.bat', 'win_remote_install.bat') }"
 win_remote_install.bat
 
 ```
@@ -49,7 +49,7 @@ Usage
 
 **Linux:**
 
-Run `githook add` in a git project tell it to use git-hooks hooks.
+Run `githook add` in a git project to tell it to use git-hooks hooks.
 
 You can run `githook remove` at any time to revert to your previous hooks.  (These are usually the default hooks, which do nothing.)
 
