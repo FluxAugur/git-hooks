@@ -26,6 +26,24 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+hooktmp=`mktemp -d`
+
+function cleanup
+{
+    rm -r ${hooktmp}
+}
+trap cleanup EXIT
+
+function find_head
+{
+    if git rev-parse --verify HEAD >/dev/null 2>&1 ; then
+        echo "HEAD"
+    else
+        # First commit, use an empty tree
+        echo "`git hash-object -t tree /dev/null`"
+    fi
+}
+
 function hook_dirs
 {
     if [ ! -z "${1}" ] ; then
@@ -40,6 +58,12 @@ function hook_dirs
         cd $(git rev-parse --show-toplevel)
         echo "${PWD}/git_hooks${hook}"
         echo "${PWD}/.githooks${hook}"
+    else
+        head=`find_head`
+        if [[ ! -z $(git ls-tree -r ${head} .githooks) ]]; then
+            git archive ${head} .githooks | tar xf - -C ${hooktmp} &> /dev/null
+            echo "${hooktmp}/.githooks${hook}"
+        fi
     fi
     fi
     eval echo "`git config hooks.global`"${hook}
