@@ -1,0 +1,77 @@
+#!/bin/sh
+
+hooktmp=`mktemp -d`
+files_pattern='\.java$'
+
+function cleanup
+{
+    if [ ! -z ${GIT_HOOKS_VERBOSE} ] ; then
+        echo "checkstyle: Deleting ${hooktmp}"
+        rm -r ${hooktmp}
+    fi
+}
+trap cleanup EXIT
+
+function first_last_change
+{
+    (
+        while read oldrev newrev ref; do
+            current_newrev=${newrev}
+            if [[ -z ${current_old_rev} ]] ; then
+                if [ "$oldrev" == "0000000000000000000000000000000000000000" ]; then
+                    oldrev="${newrev}^"
+                fi
+
+                current_oldrev="${oldrev}"
+            fi
+        done
+        echo "${current_oldrev} ${current_newrev}"
+    )
+}
+
+function run_test
+{
+    changes=`cat`
+    # loop over each refname
+    echo ${changes} | cut -f 3 -d ' ' | sort | uniq | \
+        while read refname; do
+            hooktmpref="${hooktmp}/${refname}"
+            
+            # find the first and last commits for the refname
+            first_last=$(echo ${changes} | grep -E "${refname}$" | first_last_change)
+            last=$(echo ${first_last} | cut -f 2 -d ' ')
+
+            # find changed Java files between the first and last commits
+            files=`git diff --name-only --diff-filter=ACM ${first_last} | grep -e ${files_pattern}`
+
+            # run checkStyle on the changed files
+            if [ -n "${files}" ]; then
+                for file in ${files}; do
+                    mkdir -p "${hooktmpref}/`dirname ${file}`" &>/dev/null
+                    git show ${last}:${file} > ${hooktmpref}/${file}
+                done;
+
+                output=$(/usr/local/scripts/checkStyle -i -r ${hooktmpref} 2>/dev/null)
+                err=$?
+
+                if [ ${err} -ne 0 ]; then
+                    echo "push aborted, checkstyle failures:"
+                    echo "${output}" | \
+                        head -n -1 | \
+                        tail -n 2 | \
+                        sed -e "s|^${hooktmpref}/||"
+                    exit ${err}
+                fi
+            fi
+        done
+}
+
+case "${1}" in
+    --about )
+        echo "Run checkStyle on Added, Copied and Modified Java source files"
+        ;;
+    * )
+        run_test
+        ;;
+esac
+
