@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 hooktmp=`mktemp -d`
 files_pattern='\.java$'
