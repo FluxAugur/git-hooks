@@ -30,6 +30,9 @@ hooktmp=`mktemp -d`
 
 function cleanup
 {
+    if [ ! -z ${GIT_HOOKS_VERBOSE} ] ; then
+        echo "Deleting ${hooktmp}"
+    fi 
     rm -r ${hooktmp}
 }
 trap cleanup EXIT
