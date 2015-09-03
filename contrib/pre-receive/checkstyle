@@ -58,7 +58,7 @@ function run_test
                     echo "push aborted, checkstyle failures:"
                     echo "${output}" | \
                         head -n -1 | \
-                        tail -n 2 | \
+                        tail -n +2 | \
                         sed -e "s|^${hooktmpref}/||"
                     exit ${err}
                 fi
