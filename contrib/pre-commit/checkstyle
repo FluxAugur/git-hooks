@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -e
+
+hooktmp=`mktemp -d`
+files_pattern='\.java$'
+
+function cleanup
+{
+    if [ ! -z ${GIT_HOOKS_VERBOSE} ] ; then
+        echo "checkstyle: Deleting ${hooktmp}"
+    fi
+    rm -r ${hooktmp}
+}
+trap cleanup EXIT
+
+function run_test
+{
+    git diff --cached --name-only --diff-filter=ACM | \
+        grep -E ${files_pattern} | \
+        xargs -d '\n' -I % cp --parents % ${hooktmp}
+
+    if [ ! "$(ls -A ${hooktmp})" ]; then
+        exit 0
+    fi
+
+    set +e
+    output=$(/usr/local/scripts/checkStyle -i -r ${hooktmp} 2>/dev/null)
+    err=$?
+    if [ ${err} -ne 0 ]; then
+        echo "commit aborted, checkstyle failed:"
+        echo "${output}" | \
+            head -n -1 | \
+            tail -n +2 | \
+            sed -e "s|^${hooktmp}/||"
+    fi
+    set -e
+    exit ${err}
+}
+
+case "${1}" in
+    --about )
+        echo "Run checkStyle on Added, Copied and Modified Java source files."
+        ;;
+    * )
+        run_test
+        ;;
+esac
