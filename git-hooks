@@ -26,7 +26,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-
 function usage {
     echo 'Git Hooks'
     echo 'git hook [option] [cmd]'
@@ -36,6 +35,12 @@ function usage {
     echo '                          git hooks run [hook].  Move old hooks directory to hooks.old'
     echo '    --uninstall           Remove existing hooks in this repository and rename hooks.old'
     echo '                          back to hooks'
+    echo '    --install-global'
+    echo '                   Create a template .git directory that that will be used whenever'
+    echo '                   a git repository is created or cloned that will remind the user'
+    echo '                   to install git-hooks.'
+    echo '    --uninstall-global'
+    echo '                   Turn off the global .git directory template that has the reminder.'
     echo '    --enable, -e [HOOK]   Enable the specified hook, if no hook name is specified, all'
     echo '                          hooks will be enabled'
     echo '    --disable, -d [HOOK]  Disable the specified hook, if no hook name is specified, all'
@@ -43,6 +48,63 @@ function usage {
     echo 'Commands:'
     echo '    run [cmd]      Run the hooks for cmd (such as pre-commit)'
     echo '    list           Show currently installed hooks'
+
+hooktmp=`mktemp -d`
+
+function cleanup
+{
+    if [ ! -z ${GIT_HOOKS_VERBOSE} ] ; then
+        echo "Deleting ${hooktmp}"
+    fi 
+    rm -r ${hooktmp}
+}
+trap cleanup EXIT
+
+function find_head
+{
+    if git rev-parse --verify HEAD >/dev/null 2>&1 ; then
+        echo "HEAD"
+    else
+        # First commit, use an empty tree
+        echo "`git hash-object -t tree /dev/null`"
+    fi
+}
+
+function hook_dirs
+{
+    if [ ! -z "${1}" ] ; then
+        hook="/${1}"
+    else
+        hook=""
+    fi
+    echo "${HOME}/.git_hooks${hook}"
+    git rev-parse --git-dir &> /dev/null
+    if [ $? -eq 0 ]; then
+    if [ $(git rev-parse --is-bare-repository) = 'false' ]; then
+        cd $(git rev-parse --show-toplevel)
+        echo "${PWD}/git_hooks${hook}"
+        echo "${PWD}/.githooks${hook}"
+    else
+        head=`find_head`
+        if [[ ! -z $(git ls-tree -r ${head} .githooks) ]]; then
+            git archive ${head} .githooks | tar xf - -C ${hooktmp} &> /dev/null
+            echo "${hooktmp}/.githooks${hook}"
+        fi
+    fi
+    fi
+    eval echo "`git config hooks.global`"${hook}
+}
+
+function list_hooks_in_dir
+{
+    path="${1}"
+    level="${2}"
+    find --help 2>&1 | grep -- '-L' 2>/dev/null >/dev/null
+    if [ $? -eq 1 ] ; then
+        find "${path}/" -mindepth ${level} -maxdepth ${level} -perm +111 -type f 2>/dev/null | grep -v "^.$" | sort
+    else
+        find -L "${path}/" -mindepth ${level} -maxdepth ${level} -perm +111 -type f 2>/dev/null | grep -v "^.$" | sort
+    fi
 }
 
 
@@ -115,6 +177,22 @@ function run_hook
 ##
 #   Install / Uninstall hooks in the git repository
 ##
+function install_hooks_into
+{
+    DIR=$1
+    cd "${DIR}"
+
+    set -e
+    mv hooks hooks.old
+    set +e
+    mkdir hooks
+    cd hooks
+    for file in applypatch-msg commit-msg post-applypatch post-checkout post-commit post-merge post-receive pre-applypatch pre-auto-gc pre-commit prepare-commit-msg pre-rebase pre-receive update pre-push
+    do
+        echo "${2}" > "${file}"
+        chmod +x "${file}"
+    done
+}
 function install_hooks
 {
     GITDIR=`git rev-parse --git-dir`
@@ -153,6 +231,30 @@ function install_user_hooks
     do
         (cd "$i" && install_hooks --install)
     done
+}
+
+function install_global 
+{
+    TEMPLATE="$HOME/.git-template-with-git-hooks"
+    if [ ! -d "${TEMPLATE}" ] ; then
+        DEFAULT=/usr/share/git-core/templates
+        if [ -d ${DEFAULT} ] ; then
+            cp -rf /usr/share/git-core/templates "${TEMPLATE}"
+        else
+            mkdir -p "${TEMPLATE}/hooks"
+        fi
+        cmd="#!/usr/bin/env bash
+echo \"git hooks not installed in this repository.  Run 'git hooks --install' to install it or 'git hooks -h' for more information.\"";
+        install_hooks_into "${TEMPLATE}" "${cmd}"
+        mv "${TEMPLATE}/hooks.old" "${TEMPLATE}/hooks.original"
+    fi
+    git config --global init.templatedir "${TEMPLATE}"
+    echo "Git global config init.templatedir is now set to ${TEMPLATE}"
+}
+
+function uninstall_global 
+{
+    git config --global --unset init.templatedir
 }
 
 ##
@@ -286,6 +388,12 @@ case $1 in
         ;;
     --install-user )
         install_user_hooks "$1"
+    --install-global|--installglobal )
+        install_global
+        ;;
+    --uninstall-global|--uninstallglobal )
+        uninstall_global
+        ;;
     -e|--enable )
         enable_hook $2
         ;;
