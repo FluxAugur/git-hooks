@@ -146,6 +146,15 @@ git-hooks run "$0" "$@"' > "${file}"
     fi
 }
 
+function install_user_hooks
+{
+    cd ${HOME}
+    find . -name '.git' -type d | while read i;
+    do
+        (cd "$i" && install_hooks --install)
+    done
+}
+
 ##
 #   List function
 ##
@@ -275,6 +284,8 @@ case $1 in
     --install|--uninstall )
         install_hooks "$1"
         ;;
+    --install-user )
+        install_user_hooks "$1"
     -e|--enable )
         enable_hook $2
         ;;
