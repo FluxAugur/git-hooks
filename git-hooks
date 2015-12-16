@@ -87,10 +87,20 @@ function run_hook
     fi
     shift 1
     for dir in `hook_dirs "${hook}"`; do
-        if [ ! -d "${dir}" ] ; then
-            continue
+        if [ -d "${dir}" ]
+	then
+		run_hooks "${dir}" "$@"
+	elif [ `git config core.bare` = 'true' ]
+	then
+		# Extract the hooks from the HEAD revision into a tmp dir and run them:
+		git ls-tree -r HEAD git_hooks/"${dir}" |
+		while read mode type sha1 name
+		do
+			hook="$tmpdir/`basename $name`".hook
+			git show "$sha1" >"$hook"
+			sh "$hook" "$@"
+		done
         fi
-        run_hooks "${dir}" "$@"
     done
     set +e
 }
