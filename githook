@@ -28,26 +28,22 @@
 
 function usage {
     echo 'Git Hooks'
-    echo 'git hook [option] [cmd]'
+    echo '    A tool to manage global git hooks for multiple git repositories.'
+    echo '    https://github.com/SDW-CC/git-hooks'
     echo ''
     echo 'Options:'
-    echo '    --install             Replace existing hooks in this repository with a call to'
-    echo '                          git hooks run [hook].  Move old hooks directory to hooks.old'
-    echo '    --uninstall           Remove existing hooks in this repository and rename hooks.old'
-    echo '                          back to hooks'
-    echo '    --install-global'
-    echo '                   Create a template .git directory that that will be used whenever'
-    echo '                   a git repository is created or cloned that will remind the user'
-    echo '                   to install git-hooks.'
-    echo '    --uninstall-global'
-    echo '                   Turn off the global .git directory template that has the reminder.'
-    echo '    --enable, -e [HOOK]   Enable the specified hook, if no hook name is specified, all'
-    echo '                          hooks will be enabled'
-    echo '    --disable, -d [HOOK]  Disable the specified hook, if no hook name is specified, all'
-    echo '                          hooks will be disabled'
-    echo 'Commands:'
-    echo '    run [cmd]      Run the hooks for cmd (such as pre-commit)'
-    echo '    list           Show currently installed hooks'
+    echo '    add            Replace existing hooks in this repository with a call to'
+    echo '                   ''githook run [hook]''.  Moves old hooks directory to hooks.old'
+    echo '    remove         Remove existing hooks in this repository and rename hooks.old'
+    echo '                   back to hooks'
+    echo '    add-global     Changes the hook templates directory to $HOME/.githook/templates'
+    echo '                   and creates hooks with a call to ''githook run [hook]''.'
+    echo '                   This directory is then used to generate hooks when you init or clone'
+    echo '    remove-global  Resets the hook template directory to dafault'
+    echo '    run <cmd>      Run the hooks for <cmd> (such as pre-commit)'
+    echo '    help           Displays a list of options'
+    echo '    (no arguments) Show currently available hooks'
+}
 
 hooktmp=`mktemp -d`
 
@@ -84,12 +80,6 @@ function hook_dirs
         cd $(git rev-parse --show-toplevel)
         echo "${PWD}/git_hooks${hook}"
         echo "${PWD}/.githooks${hook}"
-    else
-        head=`find_head`
-        if [[ ! -z $(git ls-tree -r ${head} .githooks) ]]; then
-            git archive ${head} .githooks | tar xf - -C ${hooktmp} &> /dev/null
-            echo "${hooktmp}/.githooks${hook}"
-        fi
     fi
     fi
     eval echo "`git config hooks.global`"${hook}
@@ -107,6 +97,29 @@ function list_hooks_in_dir
     fi
 }
 
+function list_hooks
+{
+    GITDIR=`git rev-parse --git-dir`
+    cat "${GITDIR}/hooks/pre-commit" 2> /dev/null | grep 'git-hooks' > /dev/null 2> /dev/null
+    if [ $? = 0 ] ; then
+        echo "Git hooks ARE installed in this repository."
+        echo ""
+    else
+        echo "Git hooks are NOT installed in this repository. (Run 'git hooks --install' to install it)"
+        echo ""
+    fi
+
+    echo 'Listing User, Project, and Global hooks:'
+    echo '---'
+    for dir in `hook_dirs`; do
+        echo "${dir}:"
+        for hook in `list_hooks_in_dir "${dir}" 2` ; do
+            echo -n `basename \`dirname "${hook}"\``
+            echo -e "/`basename "${hook}"` \t- `${hook} --about`"
+        done
+        echo ""
+    done
+}
 
 function run_hooks
 {
@@ -181,15 +194,28 @@ function install_hooks_into
 {
     DIR=$1
     cd "${DIR}"
-
-    set -e
-    mv hooks hooks.old
-    set +e
+    if [ -d "hooks" ] ; then
+        set -e
+        mv hooks hooks.old
+        set +e
+    fi
     mkdir hooks
     cd hooks
+
+    if [ "$(uname)" == "Darwin" ]; then
+        cmd='#!/bin/bash
+githook run "$0" "$@"';
+    elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+        cmd='#!/bin/bash
+githook run "$0" "$@"';
+    else
+        cmd='#!/bin/bash
+githook.sh run "$0" "$@"';
+    fi
+
     for file in applypatch-msg commit-msg post-applypatch post-checkout post-commit post-merge post-receive pre-applypatch pre-auto-gc pre-commit prepare-commit-msg pre-rebase pre-receive update pre-push
     do
-        echo "${2}" > "${file}"
+        echo "${cmd}" > "${file}"
         chmod +x "${file}"
     done
 }
@@ -222,6 +248,7 @@ git-hooks run "$0" "$@"' > "${file}"
         rm -rf hooks
         mv hooks.old hooks
     fi
+    return 0
 }
 
 function install_user_hooks
@@ -235,19 +262,9 @@ function install_user_hooks
 
 function install_global 
 {
-    TEMPLATE="$HOME/.git-template-with-git-hooks"
-    if [ ! -d "${TEMPLATE}" ] ; then
-        DEFAULT=/usr/share/git-core/templates
-        if [ -d ${DEFAULT} ] ; then
-            cp -rf /usr/share/git-core/templates "${TEMPLATE}"
-        else
-            mkdir -p "${TEMPLATE}/hooks"
-        fi
-        cmd="#!/usr/bin/env bash
-echo \"git hooks not installed in this repository.  Run 'git hooks --install' to install it or 'git hooks -h' for more information.\"";
-        install_hooks_into "${TEMPLATE}" "${cmd}"
-        mv "${TEMPLATE}/hooks.old" "${TEMPLATE}/hooks.original"
-    fi
+    TEMPLATE="$HOME/.githook/templates"
+    mkdir -p "${TEMPLATE}"
+    install_hooks_into "${TEMPLATE}"
     git config --global init.templatedir "${TEMPLATE}"
     echo "Git global config init.templatedir is now set to ${TEMPLATE}"
 }
@@ -383,15 +400,13 @@ case $1 in
         trap report_error ERR
         run_hook "$@"
         ;;
-    --install|--uninstall )
+    add|remove )
         install_hooks "$1"
         ;;
-    --install-user )
-        install_user_hooks "$1"
-    --install-global|--installglobal )
+    add-global )
         install_global
         ;;
-    --uninstall-global|--uninstallglobal )
+    remove-global )
         uninstall_global
         ;;
     -e|--enable )
