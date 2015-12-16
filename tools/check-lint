@@ -1,0 +1,30 @@
+#! /bin/bash
+
+tmp="/tmp/check-lint.$$.tmp"
+log="/tmp/check-lint.$$.log"
+trap "rm -f $log; exit 0" 0 2 3 15
+
+while read file
+do
+	case "$file" in
+	*.js)
+		if ! jsl --conf .jsl.conf --process "$file" > $tmp
+		then
+			echo "Checking $file:" >> $log
+			cat $tmp >> $log
+		fi
+		;;
+	*)
+		echo "No check for $file"
+		;;
+	esac
+done
+
+# If there were problems, report them and exit:
+if [ -s $log ]
+then
+	cat $log
+	exit 1
+fi
+
+exit 0
