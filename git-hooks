@@ -127,7 +127,7 @@ function install_hooks
         mv hooks hooks.old
         mkdir hooks
         cd hooks
-        for file in applypatch-msg commit-msg post-applypatch post-checkout post-commit post-merge post-receive pre-applypatch pre-auto-gc pre-commit prepare-commit-msg pre-rebase pre-receive update
+        for file in applypatch-msg commit-msg post-applypatch post-checkout post-commit post-merge post-receive post-update pre-applypatch pre-auto-gc pre-commit prepare-commit-msg pre-rebase pre-receive update
         do
             echo '#!/bin/bash
 git-hooks run "$0" "$@"' > "${file}"
