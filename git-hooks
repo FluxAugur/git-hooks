@@ -47,6 +47,60 @@ function usage {
 
 hooktmp=`mktemp -d`
 
+# get versions of some tools
+FIND_VERSION="`find -version|head -n 1|cut -d " " -f 4`"
+SORT_VERSION="`sort --version|head -n 1|cut -d " " -f 4`"
+
+# vercomp() and testvercomp() by Dennis Williamson,
+# <http://stackoverflow.com/questions/4023830/bash-how-compare-two-strings-in-version-format>
+function vercomp
+{
+    if [[ $1 == $2 ]]
+    then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+    do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++))
+    do
+        if [[ -z ${ver2[i]} ]]
+        then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]}))
+        then
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]}))
+        then
+            return 2
+        fi
+    done
+    return 0
+}
+
+function testvercomp
+{
+    vercomp $1 $2
+    case $? in
+        0) op='=';;
+        1) op='>';;
+        2) op='<';;
+    esac
+    if [[ $op != $3 ]]
+    then
+        exit 1
+    else
+        exit 0
+    fi
+}
+
 function cleanup
 {
     if [ ! -z ${GIT_HOOKS_VERBOSE} ] ; then
@@ -87,26 +141,18 @@ function hook_dirs
 
 function list_hooks_in_dir
 {
-    path="${1}"
-    level="${2}"
-    find --help 2>&1 | grep -- '-L' 2>/dev/null >/dev/null
-    if [ $? -eq 1 ] ; then
-        find "${path}/" -mindepth ${level} -maxdepth ${level} -perm +111 -type f 2>/dev/null | grep -v "^.$" | sort
+    if [ "$(testvercomp $FIND_VERSION 4.3.8 '>')" ] ;then
+        if [ "$(testvercomp $SORT_VERSION 7.0 '>')" ] ; then
+                find -L "${1}/" -executable -type f 2>/dev/null | grep -v "^.$" | sort -V
+            else
+                find -L "${1}/" -executable -type f 2>/dev/null | grep -v "^.$" | sort
+            fi
     else
-        find -L "${path}/" -mindepth ${level} -maxdepth ${level} -perm +111 -type f 2>/dev/null | grep -v "^.$" | sort
-    fi
-}
-
-function list_hooks
-{
-    GITDIR=`git rev-parse --git-dir`
-    cat "${GITDIR}/hooks/pre-commit" 2> /dev/null | grep 'git-hooks' > /dev/null 2> /dev/null
-    if [ $? = 0 ] ; then
-        echo "Git hooks ARE installed in this repository."
-        echo ""
-    else
-        echo "Git hooks are NOT installed in this repository. (Run 'git hooks --install' to install it)"
-        echo ""
+        if [ "$(testvercomp $SORT_VERSION 7.0 '<')" ] ; then
+            find -L "${1}/" -perm /u=x,g=x,o=x -type f 2>/dev/null | grep -v "^.$" | sort -V
+        else
+            find -L "${1}/" -perm /u=x,g=x,o=x -type f 2>/dev/null | grep -v "^.$" | sort
+        fi
     fi
 
     echo 'Listing User, Project, and Global hooks:'
