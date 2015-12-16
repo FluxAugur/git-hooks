@@ -79,16 +79,23 @@ function report_error {
 
 function run_hook
 {
-    set -e
-    hook=`basename "${1}"`
-    if [ -z ${hook} ] ; then
-        echo "run requires a hook argument"
-        return 1
-    fi
-    shift 1
-    for dir in `hook_dirs "${hook}"`; do
-        if [ -d "${dir}" ]
-	then
+	hook=`basename "${1}"`
+	if [ -z ${hook} ] ; then
+		echo "run requires a hook argument"
+		return 1
+	fi
+	if [ "${hook}" == "pre-commit" ]; then
+		git diff-index --quiet HEAD --
+		if [ $? -gt 0 ]; then
+			git stash --quiet --include-untracked --keep-index
+			gottasave="yup"
+		fi
+	fi
+	shift 1
+	for dir in `hook_dirs "${hook}"`; do
+		if [ ! -d "${dir}" ] ; then
+			continue
+		fi
 		run_hooks "${dir}" "$@"
 	elif [ `git config core.bare` = 'true' ]
 	then
