@@ -193,6 +193,10 @@ function list_hooks
 
     echo 'Listing User, Project, and Global hooks:'
     echo '---'
+
+    SAVE_IFS=$IFS
+    IFS=$(echo -en "\n\b")
+
     for dir in `hook_dirs`; do
         echo "${dir}:"
         for hook in `list_hooks_in_dir "${dir}"` ; do
@@ -213,6 +217,7 @@ function list_hooks
         done
         echo ""
     done
+    IFS=$SAVE_IFS
 }
 
 ##
